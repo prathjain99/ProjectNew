@@ -67,4 +67,24 @@ public class AuthService {
         
         return new AuthResponse(token, userDto);
     }
+    
+    // Method to create demo users if they don't exist
+    public void createDemoUsersIfNotExist() {
+        createDemoUserIfNotExists("client1", "client1@quantcrux.com", "Client User", Role.CLIENT);
+        createDemoUserIfNotExists("pm1", "pm1@quantcrux.com", "Portfolio Manager", Role.PORTFOLIO_MANAGER);
+        createDemoUserIfNotExists("researcher1", "researcher1@quantcrux.com", "Researcher User", Role.RESEARCHER);
+    }
+    
+    private void createDemoUserIfNotExists(String username, String email, String name, Role role) {
+        if (!userRepository.existsByUsername(username)) {
+            User user = new User(
+                    username,
+                    email,
+                    passwordEncoder.encode("password"),
+                    role,
+                    name
+            );
+            userRepository.save(user);
+        }
+    }
 }
