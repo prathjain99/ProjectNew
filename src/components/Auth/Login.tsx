@@ -2,35 +2,60 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, Lock, User } from 'lucide-react';
+import { TrendingUp, Lock, User, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
       await login(username, password);
       toast.success('Welcome to QuantCrux!');
       navigate('/dashboard');
-    } catch (error) {
-      toast.error('Invalid credentials');
+    } catch (error: any) {
+      const errorMessage = error.message || 'Invalid credentials';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleDemoLogin = (demoUsername: string) => {
+    setUsername(demoUsername);
+    setPassword('password');
+    setError('');
+  };
+
   const demoAccounts = [
-    { username: 'client1', role: 'Client', description: 'View portfolios and investments' },
-    { username: 'pm1', role: 'Portfolio Manager', description: 'Create products and manage allocations' },
-    { username: 'researcher1', role: 'Researcher', description: 'Build strategies and run backtests' }
+    { 
+      username: 'client1', 
+      role: 'Client', 
+      description: 'View portfolios and investments',
+      color: 'from-blue-500 to-blue-600'
+    },
+    { 
+      username: 'pm1', 
+      role: 'Portfolio Manager', 
+      description: 'Create products and manage allocations',
+      color: 'from-green-500 to-green-600'
+    },
+    { 
+      username: 'researcher1', 
+      role: 'Researcher', 
+      description: 'Build strategies and run backtests',
+      color: 'from-purple-500 to-purple-600'
+    }
   ];
 
   return (
@@ -65,28 +90,38 @@ const Login: React.FC = () => {
 
           <div className="grid gap-4">
             <h3 className="text-xl font-semibold text-blue-400">Demo Accounts</h3>
+            <p className="text-sm text-gray-400 mb-2">
+              Click any account below to auto-fill credentials, then click "Sign In"
+            </p>
             {demoAccounts.map((account, index) => (
               <motion.div
                 key={account.username}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + index * 0.1 }}
-                className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
-                onClick={() => {
-                  setUsername(account.username);
-                  setPassword('password');
-                }}
+                className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-gray-700/50 transition-all duration-200 hover:border-blue-500/50"
+                onClick={() => handleDemoLogin(account.username)}
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="font-medium text-blue-400">@{account.username}</span>
-                    <span className="text-yellow-400 ml-2 text-sm">({account.role})</span>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium text-blue-400">@{account.username}</span>
+                      <span className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${account.color} text-white`}>
+                        {account.role}
+                      </span>
+                    </div>
+                    <p className="text-gray-300 text-sm mt-1">{account.description}</p>
                   </div>
-                  <span className="text-xs text-gray-400">Click to use</span>
+                  <span className="text-xs text-gray-500">Click to use</span>
                 </div>
-                <p className="text-gray-300 text-sm mt-1">{account.description}</p>
               </motion.div>
             ))}
+            
+            <div className="mt-4 p-3 bg-yellow-600/20 border border-yellow-500/30 rounded-lg">
+              <p className="text-yellow-400 text-sm">
+                <strong>Note:</strong> Make sure the backend services are running. Use <code className="bg-gray-800 px-1 rounded">npm run backend:up</code> to start them.
+              </p>
+            </div>
           </div>
         </motion.div>
 
@@ -102,6 +137,17 @@ const Login: React.FC = () => {
             <p className="text-gray-400">Sign in to access your trading platform</p>
           </div>
 
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-3 bg-red-600/20 border border-red-500/30 rounded-lg flex items-center space-x-2"
+            >
+              <AlertCircle className="h-4 w-4 text-red-400" />
+              <span className="text-red-400 text-sm">{error}</span>
+            </motion.div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -112,7 +158,10 @@ const Login: React.FC = () => {
                 <input
                   type="text"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    setError('');
+                  }}
                   className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter username"
                   required
@@ -129,7 +178,10 @@ const Login: React.FC = () => {
                 <input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError('');
+                  }}
                   className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter password"
                   required
@@ -140,8 +192,8 @@ const Login: React.FC = () => {
             <motion.button
               type="submit"
               disabled={loading}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: loading ? 1 : 1.02 }}
+              whileTap={{ scale: loading ? 1 : 0.98 }}
               className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               {loading ? (
@@ -157,7 +209,7 @@ const Login: React.FC = () => {
 
           <div className="mt-6 text-center">
             <p className="text-gray-400 text-sm">
-              Demo credentials: Any username above with password <span className="text-blue-400 font-mono">"password"</span>
+              Demo credentials: Use any username above with password <span className="text-blue-400 font-mono">"password"</span>
             </p>
           </div>
         </motion.div>
