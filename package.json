@@ -13,8 +13,11 @@
     "backend:down": "docker-compose down",
     "backend:logs": "docker-compose logs -f",
     "backend:restart": "docker-compose down && docker-compose up -d",
+    "backend:status": "docker-compose ps",
+    "backend:clean": "docker-compose down -v && docker system prune -f",
     "full-stack": "concurrently \"npm run backend:up\" \"npm run dev\"",
-    "setup": "npm install && npm run backend:build && npm run backend:up"
+    "setup": "npm install && npm run backend:build && npm run backend:up",
+    "check-health": "curl -f http://localhost:8080/actuator/health && curl -f http://localhost:8081/api/auth/health"
   },
   "dependencies": {
     "axios": "^1.6.2",

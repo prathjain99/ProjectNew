@@ -16,6 +16,11 @@ services:
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - quantcrux-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quantcrux"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Eureka Server
   eureka-server:
@@ -28,25 +33,11 @@ services:
     networks:
       - quantcrux-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
-
-  # Config Server
-  config-server:
-    build:
-      context: ./backend/config-server
-      dockerfile: Dockerfile
-    container_name: quantcrux-config
-    ports:
-      - "8888:8888"
-    depends_on:
-      - eureka-server
-    networks:
-      - quantcrux-network
-    environment:
-      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      retries: 5
+      start_period: 60s
 
   # Gateway Service
   gateway-service:
@@ -57,12 +48,20 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - eureka-server
-      - config-server
+      eureka-server:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
     networks:
       - quantcrux-network
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
   # Auth Service
   auth-service:
@@ -73,8 +72,10 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - postgres
-      - eureka-server
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
     networks:
       - quantcrux-network
     environment:
@@ -82,6 +83,12 @@ services:
       SPRING_DATASOURCE_USERNAME: quantcrux
       SPRING_DATASOURCE_PASSWORD: quantcrux123
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/api/auth/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
   # Strategy Service
   strategy-service:
@@ -92,8 +99,10 @@ services:
     ports:
       - "8082:8082"
     depends_on:
-      - postgres
-      - eureka-server
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
     networks:
       - quantcrux-network
     environment:
@@ -111,7 +120,8 @@ services:
     ports:
       - "8083:8083"
     depends_on:
-      - eureka-server
+      eureka-server:
+        condition: service_healthy
     networks:
       - quantcrux-network
     environment:
