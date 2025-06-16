@@ -2,19 +2,19 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Save, Calculator, PieChart, TrendingUp, Shield } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import axios from 'axios';
+import { productAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 
 const ProductCreator: React.FC = () => {
   const [product, setProduct] = useState({
     name: '',
     type: 'digital_option',
-    underlying_asset: 'EUR/USD',
+    underlyingAsset: 'EUR/USD',
     strike: 1.10,
     barrier: 1.05,
     coupon: 0.08,
     notional: 100000,
-    maturity_months: 12,
+    maturityMonths: 12,
     issuer: 'Dealer 1',
     currency: 'USD'
   });
@@ -22,13 +22,32 @@ const ProductCreator: React.FC = () => {
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
+    if (!product.name.trim()) {
+      toast.error('Please enter a product name');
+      return;
+    }
+
     setSaving(true);
     try {
-      const response = await axios.post('http://localhost:3001/api/products', product);
+      await productAPI.createProduct(product);
       toast.success('Product created successfully!');
-      console.log('Created product:', response.data);
+      
+      // Reset form
+      setProduct({
+        name: '',
+        type: 'digital_option',
+        underlyingAsset: 'EUR/USD',
+        strike: 1.10,
+        barrier: 1.05,
+        coupon: 0.08,
+        notional: 100000,
+        maturityMonths: 12,
+        issuer: 'Dealer 1',
+        currency: 'USD'
+      });
     } catch (error) {
       toast.error('Failed to create product');
+      console.error('Product creation error:', error);
     } finally {
       setSaving(false);
     }
@@ -128,8 +147,8 @@ const ProductCreator: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Underlying Asset</label>
                 <select
-                  value={product.underlying_asset}
-                  onChange={(e) => setProduct(prev => ({ ...prev, underlying_asset: e.target.value }))}
+                  value={product.underlyingAsset}
+                  onChange={(e) => setProduct(prev => ({ ...prev, underlyingAsset: e.target.value }))}
                   className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="EUR/USD">EUR/USD</option>
@@ -181,8 +200,8 @@ const ProductCreator: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-300 mb-2">Maturity (Months)</label>
                 <input
                   type="number"
-                  value={product.maturity_months}
-                  onChange={(e) => setProduct(prev => ({ ...prev, maturity_months: parseInt(e.target.value) }))}
+                  value={product.maturityMonths}
+                  onChange={(e) => setProduct(prev => ({ ...prev, maturityMonths: parseInt(e.target.value) }))}
                   className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -298,7 +317,7 @@ const ProductCreator: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Underlying:</span>
-                <span className="text-white">{product.underlying_asset}</span>
+                <span className="text-white">{product.underlyingAsset}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Strike:</span>
@@ -324,7 +343,7 @@ const ProductCreator: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Maturity:</span>
-                <span className="text-white">{product.maturity_months} months</span>
+                <span className="text-white">{product.maturityMonths} months</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Issuer:</span>
@@ -350,7 +369,7 @@ const ProductCreator: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Yield to Maturity:</span>
-                <span className="text-white">{(product.coupon * 100 / product.maturity_months * 12).toFixed(2)}%</span>
+                <span className="text-white">{(product.coupon * 100 / product.maturityMonths * 12).toFixed(2)}%</span>
               </div>
             </div>
           </div>

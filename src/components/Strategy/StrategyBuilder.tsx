@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Save, Settings, TrendingUp, BarChart } from 'lucide-react';
-import axios from 'axios';
+import { strategyAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 
 const StrategyBuilder: React.FC = () => {
   const [strategy, setStrategy] = useState({
     name: '',
     description: '',
-    asset_list: ['SPY'],
+    assetList: ['SPY'],
     indicators: {
       ema_short: 10,
       ema_long: 20,
@@ -26,17 +26,38 @@ const StrategyBuilder: React.FC = () => {
     }
   });
 
+  const [strategies, setStrategies] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    fetchStrategies();
+  }, []);
+
+  const fetchStrategies = async () => {
+    try {
+      const response = await strategyAPI.getStrategies();
+      setStrategies(response.data);
+    } catch (error) {
+      console.error('Failed to fetch strategies:', error);
+    }
+  };
+
   const handleSave = async () => {
+    if (!strategy.name.trim()) {
+      toast.error('Please enter a strategy name');
+      return;
+    }
+
     setSaving(true);
     try {
-      await axios.post('http://localhost:3001/api/strategies', strategy);
+      await strategyAPI.createStrategy(strategy);
       toast.success('Strategy saved successfully!');
+      
+      // Reset form
       setStrategy({
         name: '',
         description: '',
-        asset_list: ['SPY'],
+        assetList: ['SPY'],
         indicators: {
           ema_short: 10,
           ema_long: 20,
@@ -53,8 +74,12 @@ const StrategyBuilder: React.FC = () => {
           position_size: 1
         }
       });
+      
+      // Refresh strategies list
+      fetchStrategies();
     } catch (error) {
       toast.error('Failed to save strategy');
+      console.error('Strategy save error:', error);
     } finally {
       setSaving(false);
     }
@@ -63,8 +88,21 @@ const StrategyBuilder: React.FC = () => {
   const addAsset = () => {
     setStrategy(prev => ({
       ...prev,
-      asset_list: [...prev.asset_list, 'AAPL']
+      assetList: [...prev.assetList, 'AAPL']
     }));
+  };
+
+  const removeAsset = (index: number) => {
+    if (strategy.assetList.length > 1) {
+      const newAssets = strategy.assetList.filter((_, i) => i !== index);
+      setStrategy(prev => ({ ...prev, assetList: newAssets }));
+    }
+  };
+
+  const updateAsset = (index: number, value: string) => {
+    const newAssets = [...strategy.assetList];
+    newAssets[index] = value;
+    setStrategy(prev => ({ ...prev, assetList: newAssets }));
   };
 
   return (
@@ -127,24 +165,17 @@ const StrategyBuilder: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Assets</label>
               <div className="space-y-2">
-                {strategy.asset_list.map((asset, index) => (
+                {strategy.assetList.map((asset, index) => (
                   <div key={index} className="flex items-center space-x-2">
                     <input
                       type="text"
                       value={asset}
-                      onChange={(e) => {
-                        const newAssets = [...strategy.asset_list];
-                        newAssets[index] = e.target.value;
-                        setStrategy(prev => ({ ...prev, asset_list: newAssets }));
-                      }}
+                      onChange={(e) => updateAsset(index, e.target.value)}
                       className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500"
                     />
-                    {strategy.asset_list.length > 1 && (
+                    {strategy.assetList.length > 1 && (
                       <button
-                        onClick={() => {
-                          const newAssets = strategy.asset_list.filter((_, i) => i !== index);
-                          setStrategy(prev => ({ ...prev, asset_list: newAssets }));
-                        }}
+                        onClick={() => removeAsset(index)}
                         className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
                       >
                         ×
@@ -331,6 +362,33 @@ const StrategyBuilder: React.FC = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Existing Strategies */}
+      {strategies.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-gray-800 border border-gray-700 rounded-xl p-6"
+        >
+          <h3 className="text-xl font-semibold text-white mb-4">Your Strategies</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {strategies.map((strategy, index) => (
+              <div key={strategy.id || index} className="p-4 bg-gray-700 rounded-lg">
+                <h4 className="text-white font-medium">{strategy.name}</h4>
+                <p className="text-gray-400 text-sm mt-1">{strategy.description}</p>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {strategy.assetList?.map((asset: string, i: number) => (
+                    <span key={i} className="px-2 py-1 bg-blue-600/20 text-blue-400 text-xs rounded">
+                      {asset}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

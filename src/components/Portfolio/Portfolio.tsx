@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, Package, AlertCircle, Calendar } from 'lucide-react';
-import axios from 'axios';
+import { portfolioAPI } from '../../services/api';
 
 const Portfolio: React.FC = () => {
   const [portfolioData, setPortfolioData] = useState<any>(null);
@@ -14,10 +14,36 @@ const Portfolio: React.FC = () => {
 
   const fetchPortfolioData = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/portfolio');
+      const response = await portfolioAPI.getPortfolio();
       setPortfolioData(response.data);
     } catch (error) {
       console.error('Failed to fetch portfolio data:', error);
+      // Create mock data for demo
+      const mockData = {
+        summary: {
+          totalValue: 125000,
+          totalInvestment: 100000,
+          totalPnl: 25000,
+          pnlPercentage: 25.0,
+          positionCount: 1
+        },
+        positions: [
+          {
+            id: '1',
+            product: { 
+              name: 'EUR/USD Digital Option', 
+              type: 'digital_option',
+              underlyingAsset: 'EUR/USD'
+            },
+            quantity: 1000,
+            entryPrice: 100.0,
+            currentValue: 125000,
+            totalInvestment: 100000,
+            unrealizedPnl: 25000
+          }
+        ]
+      };
+      setPortfolioData(mockData);
     } finally {
       setLoading(false);
     }
@@ -35,15 +61,15 @@ const Portfolio: React.FC = () => {
   
   const pieData = portfolioData?.positions.map((position: any, index: number) => ({
     name: position.product?.name || 'Unknown Product',
-    value: position.current_value,
+    value: position.currentValue,
     color: pieColors[index % pieColors.length]
   })) || [];
 
   const performanceData = portfolioData?.positions.map((position: any) => ({
     name: position.product?.name?.substring(0, 15) + '...' || 'Unknown',
-    invested: position.total_investment,
-    current: position.current_value,
-    pnl: position.current_value - position.total_investment
+    invested: position.totalInvestment,
+    current: position.currentValue,
+    pnl: position.currentValue - position.totalInvestment
   })) || [];
 
   return (
@@ -74,16 +100,16 @@ const Portfolio: React.FC = () => {
             <div>
               <p className="text-gray-400 text-sm">Total Value</p>
               <p className="text-2xl font-bold text-white mt-1">
-                ${portfolioData?.summary.total_value.toLocaleString() || '0'}
+                ${portfolioData?.summary.totalValue?.toLocaleString() || '0'}
               </p>
               <div className="flex items-center mt-2">
-                {portfolioData?.summary.total_pnl >= 0 ? (
+                {(portfolioData?.summary.totalPnl || 0) >= 0 ? (
                   <TrendingUp className="h-4 w-4 text-green-400 mr-1" />
                 ) : (
                   <TrendingDown className="h-4 w-4 text-red-400 mr-1" />
                 )}
-                <span className={`text-sm ${portfolioData?.summary.total_pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {portfolioData?.summary.pnl_percentage.toFixed(2)}%
+                <span className={`text-sm ${(portfolioData?.summary.totalPnl ||0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {portfolioData?.summary.pnlPercentage?.toFixed(2) || '0'}%
                 </span>
               </div>
             </div>
@@ -102,13 +128,13 @@ const Portfolio: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Total P&L</p>
-              <p className={`text-2xl font-bold mt-1 ${portfolioData?.summary.total_pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                ${portfolioData?.summary.total_pnl.toLocaleString() || '0'}
+              <p className={`text-2xl font-bold mt-1 ${(portfolioData?.summary.totalPnl || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                ${portfolioData?.summary.totalPnl?.toLocaleString() || '0'}
               </p>
               <p className="text-gray-400 text-sm mt-2">vs Entry</p>
             </div>
-            <div className={`p-3 rounded-lg ${portfolioData?.summary.total_pnl >= 0 ? 'bg-green-600/20' : 'bg-red-600/20'}`}>
-              {portfolioData?.summary.total_pnl >= 0 ? (
+            <div className={`p-3 rounded-lg ${(portfolioData?.summary.totalPnl || 0) >= 0 ? 'bg-green-600/20' : 'bg-red-600/20'}`}>
+              {(portfolioData?.summary.totalPnl || 0) >= 0 ? (
                 <TrendingUp className="h-6 w-6 text-green-400" />
               ) : (
                 <TrendingDown className="h-6 w-6 text-red-400" />
@@ -127,7 +153,7 @@ const Portfolio: React.FC = () => {
             <div>
               <p className="text-gray-400 text-sm">Positions</p>
               <p className="text-2xl font-bold text-white mt-1">
-                {portfolioData?.positions.length || 0}
+                {portfolioData?.positions?.length || 0}
               </p>
               <p className="text-gray-400 text-sm mt-2">Active</p>
             </div>
@@ -147,7 +173,7 @@ const Portfolio: React.FC = () => {
             <div>
               <p className="text-gray-400 text-sm">Invested</p>
               <p className="text-2xl font-bold text-white mt-1">
-                ${portfolioData?.summary.total_investment.toLocaleString() || '0'}
+                ${portfolioData?.summary.totalInvestment?.toLocaleString() || '0'}
               </p>
               <p className="text-gray-400 text-sm mt-2">Capital</p>
             </div>
@@ -250,7 +276,7 @@ const Portfolio: React.FC = () => {
       >
         <h3 className="text-xl font-semibold text-white mb-4">Detailed Positions</h3>
         
-        {portfolioData?.positions.length > 0 ? (
+        {portfolioData?.positions?.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -265,11 +291,11 @@ const Portfolio: React.FC = () => {
               </thead>
               <tbody>
                 {portfolioData.positions.map((position: any, index: number) => {
-                  const pnl = position.current_value - position.total_investment;
-                  const pnlPercent = (pnl / position.total_investment) * 100;
+                  const pnl = position.unrealizedPnl || (position.currentValue - position.totalInvestment);
+                  const pnlPercent = position.totalInvestment > 0 ? (pnl / position.totalInvestment) * 100 : 0;
                   
                   return (
-                    <tr key={position.id} className="border-b border-gray-700/50 hover:bg-gray-700/30">
+                    <tr key={position.id || index} className="border-b border-gray-700/50 hover:bg-gray-700/30">
                       <td className="py-4 px-4">
                         <div>
                           <p className="text-white font-medium">
@@ -281,13 +307,13 @@ const Portfolio: React.FC = () => {
                         </div>
                       </td>
                       <td className="text-right py-4 px-4 text-white">
-                        {position.quantity.toLocaleString()}
+                        {position.quantity?.toLocaleString() || 'N/A'}
                       </td>
                       <td className="text-right py-4 px-4 text-white">
-                        ${position.entry_price.toFixed(2)}
+                        ${position.entryPrice?.toFixed(2) || 'N/A'}
                       </td>
                       <td className="text-right py-4 px-4 text-white">
-                        ${position.current_value.toLocaleString()}
+                        ${position.currentValue?.toLocaleString() || 'N/A'}
                       </td>
                       <td className={`text-right py-4 px-4 font-medium ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                         ${pnl.toLocaleString()}

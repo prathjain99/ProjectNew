@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { authAPI } from '../services/api';
 
 interface User {
   id: string;
@@ -26,40 +26,6 @@ export const useAuth = () => {
   return context;
 };
 
-// Configure axios defaults - Use gateway service
-axios.defaults.baseURL = 'http://localhost:8080';
-
-// Add request interceptor to include authorization headers
-axios.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  const user = localStorage.getItem('user');
-  
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  
-  if (user) {
-    const userData = JSON.parse(user);
-    config.headers['X-User-Id'] = userData.id;
-    config.headers['X-User-Role'] = userData.role;
-  }
-  
-  return config;
-});
-
-// Add response interceptor to handle auth errors
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -79,10 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log('Attempting login with:', { username });
       
-      const response = await axios.post('/api/auth/login', {
-        username,
-        password
-      });
+      const response = await authAPI.login({ username, password });
 
       console.log('Login response:', response.data);
 
@@ -96,14 +59,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('user', JSON.stringify(userData));
       
       setUser(userData);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 400 || error.response?.status === 401) {
-          throw new Error('Invalid username or password');
-        } else if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
-          throw new Error('Unable to connect to server. Please ensure the backend services are running.');
-        }
+      if (error.response?.status === 400 || error.response?.status === 401) {
+        throw new Error('Invalid username or password');
+      } else if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+        throw new Error('Unable to connect to server. Please ensure the backend services are running.');
       }
       throw new Error('Login failed. Please try again.');
     }

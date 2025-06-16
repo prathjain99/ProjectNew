@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { Play, Download, Calendar, TrendingUp, Target, AlertTriangle } from 'lucide-react';
-import axios from 'axios';
+import { strategyAPI, backtestAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 
 const Backtesting: React.FC = () => {
@@ -23,7 +23,7 @@ const Backtesting: React.FC = () => {
 
   const fetchStrategies = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/strategies');
+      const response = await strategyAPI.getStrategies();
       setStrategies(response.data);
     } catch (error) {
       console.error('Failed to fetch strategies:', error);
@@ -38,7 +38,7 @@ const Backtesting: React.FC = () => {
 
     setRunning(true);
     try {
-      const response = await axios.post('http://localhost:3001/api/backtest', {
+      const response = await backtestAPI.runBacktest({
         strategyId: selectedStrategy,
         ...backtestParams
       });
@@ -46,6 +46,7 @@ const Backtesting: React.FC = () => {
       toast.success('Backtest completed successfully!');
     } catch (error) {
       toast.error('Failed to run backtest');
+      console.error('Backtest error:', error);
     } finally {
       setRunning(false);
     }
@@ -208,7 +209,7 @@ const Backtesting: React.FC = () => {
           >
             <h3 className="text-xl font-semibold text-white mb-4">Equity Curve</h3>
             <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={backtestResult.equity_curve}>
+              <LineChart data={backtestResult.equity_curve || backtestResult.equityCurve}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis 
                   dataKey="date" 
@@ -287,6 +288,12 @@ const Backtesting: React.FC = () => {
                   <span className="text-gray-400">Total Return</span>
                   <span className={`font-medium ${parseFloat(backtestResult.results.total_return) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                     {(parseFloat(backtestResult.results.total_return) * 100).toFixed(2)}%
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Final Value</span>
+                  <span className="text-white font-medium">
+                    ${backtestResult.results.final_value?.toLocaleString()}
                   </span>
                 </div>
               </div>
