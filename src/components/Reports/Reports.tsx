@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Download, FileText, Calendar, Filter, Mail, Printer } from 'lucide-react';
 import { format } from 'date-fns';
+import { reportingAPI } from '../../services/api';
+import toast from 'react-hot-toast';
 
 const Reports: React.FC = () => {
   const [selectedReport, setSelectedReport] = useState('portfolio');
@@ -9,6 +11,7 @@ const Reports: React.FC = () => {
     start: format(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),
     end: format(new Date(), 'yyyy-MM-dd')
   });
+  const [generating, setGenerating] = useState(false);
 
   const reportTypes = [
     {
@@ -68,9 +71,23 @@ const Reports: React.FC = () => {
     }
   ];
 
-  const generateReport = () => {
-    // Mock report generation
-    console.log('Generating report:', selectedReport, dateRange);
+  const generateReport = async () => {
+    setGenerating(true);
+    try {
+      const response = await reportingAPI.generateReport({
+        reportType: selectedReport,
+        startDate: dateRange.start,
+        endDate: dateRange.end,
+        format: 'pdf'
+      });
+      
+      toast.success(`Report generated successfully! ID: ${response.data}`);
+    } catch (error) {
+      console.error('Failed to generate report:', error);
+      toast.error('Failed to generate report');
+    } finally {
+      setGenerating(false);
+    }
   };
 
   return (
@@ -97,10 +114,11 @@ const Reports: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={generateReport}
-            className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium"
+            disabled={generating}
+            className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium disabled:opacity-50"
           >
             <Download className="h-4 w-4" />
-            <span>Generate Report</span>
+            <span>{generating ? 'Generating...' : 'Generate Report'}</span>
           </motion.button>
         </div>
       </motion.div>

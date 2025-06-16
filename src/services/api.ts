@@ -105,4 +105,14 @@ export const userAPI = {
     api.post('/api/users/profile', profile),
 };
 
+export const analyticsAPI = {
+  getRiskMetrics: () =>
+    api.get('/api/analytics/risk-metrics'),
+};
+
+export const reportingAPI = {
+  generateReport: (request: any) =>
+    api.post('/api/reports/generate', request),
+};
+
 export default api;

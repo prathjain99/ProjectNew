@@ -127,6 +127,132 @@ services:
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
 
+  # User Service
+  user-service:
+    build:
+      context: ./backend/user-service
+      dockerfile: Dockerfile
+    container_name: quantcrux-user
+    ports:
+      - "8084:8084"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - quantcrux-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/quantcrux_user
+      SPRING_DATASOURCE_USERNAME: quantcrux
+      SPRING_DATASOURCE_PASSWORD: quantcrux123
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+
+  # Backtest Service
+  backtest-service:
+    build:
+      context: ./backend/backtest-service
+      dockerfile: Dockerfile
+    container_name: quantcrux-backtest
+    ports:
+      - "8085:8085"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - quantcrux-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/quantcrux_backtest
+      SPRING_DATASOURCE_USERNAME: quantcrux
+      SPRING_DATASOURCE_PASSWORD: quantcrux123
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+
+  # Product Service
+  product-service:
+    build:
+      context: ./backend/product-service
+      dockerfile: Dockerfile
+    container_name: quantcrux-product
+    ports:
+      - "8086:8086"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - quantcrux-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/quantcrux_product
+      SPRING_DATASOURCE_USERNAME: quantcrux
+      SPRING_DATASOURCE_PASSWORD: quantcrux123
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+
+  # Portfolio Service
+  portfolio-service:
+    build:
+      context: ./backend/portfolio-service
+      dockerfile: Dockerfile
+    container_name: quantcrux-portfolio
+    ports:
+      - "8087:8087"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - quantcrux-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/quantcrux_portfolio
+      SPRING_DATASOURCE_USERNAME: quantcrux
+      SPRING_DATASOURCE_PASSWORD: quantcrux123
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+
+  # Analytics Service
+  analytics-service:
+    build:
+      context: ./backend/analytics-service
+      dockerfile: Dockerfile
+    container_name: quantcrux-analytics
+    ports:
+      - "8088:8088"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - quantcrux-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/quantcrux_analytics
+      SPRING_DATASOURCE_USERNAME: quantcrux
+      SPRING_DATASOURCE_PASSWORD: quantcrux123
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+
+  # Reporting Service
+  reporting-service:
+    build:
+      context: ./backend/reporting-service
+      dockerfile: Dockerfile
+    container_name: quantcrux-reporting
+    ports:
+      - "8089:8089"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - quantcrux-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/quantcrux_reporting
+      SPRING_DATASOURCE_USERNAME: quantcrux
+      SPRING_DATASOURCE_PASSWORD: quantcrux123
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+
 volumes:
   postgres_data:
 

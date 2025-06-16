@@ -19,18 +19,21 @@ spring:
             - Path=/api/users/**
           filters:
             - StripPrefix=0
+            - name: JwtAuthenticationFilter
         - id: strategy-service
           uri: lb://strategy-service
           predicates:
             - Path=/api/strategies/**
           filters:
             - StripPrefix=0
+            - name: JwtAuthenticationFilter
         - id: backtest-service
           uri: lb://backtest-service
           predicates:
             - Path=/api/backtest/**
           filters:
             - StripPrefix=0
+            - name: JwtAuthenticationFilter
         - id: market-data-service
           uri: lb://market-data-service
           predicates:
@@ -43,30 +46,28 @@ spring:
             - Path=/api/products/**
           filters:
             - StripPrefix=0
-        - id: booking-service
-          uri: lb://booking-service
-          predicates:
-            - Path=/api/bookings/**
-          filters:
-            - StripPrefix=0
+            - name: JwtAuthenticationFilter
         - id: portfolio-service
           uri: lb://portfolio-service
           predicates:
             - Path=/api/portfolio/**
           filters:
             - StripPrefix=0
+            - name: JwtAuthenticationFilter
         - id: analytics-service
           uri: lb://analytics-service
           predicates:
             - Path=/api/analytics/**
           filters:
             - StripPrefix=0
+            - name: JwtAuthenticationFilter
         - id: reporting-service
           uri: lb://reporting-service
           predicates:
             - Path=/api/reports/**
           filters:
             - StripPrefix=0
+            - name: JwtAuthenticationFilter
       globalcors:
         cors-configurations:
           '[/**]':
