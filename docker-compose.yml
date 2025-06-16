@@ -22,6 +22,32 @@ services:
       timeout: 5s
       retries: 5
 
+  # Apache Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: quantcrux-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - quantcrux-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: quantcrux-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+    networks:
+      - quantcrux-network
+
   # Eureka Server
   eureka-server:
     build:
@@ -249,6 +275,75 @@ services:
       - quantcrux-network
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/quantcrux_reporting
+      SPRING_DATASOURCE_USERNAME: quantcrux
+      SPRING_DATASOURCE_PASSWORD: quantcrux123
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+
+  # Booking Service
+  booking-service:
+    build:
+      context: ./backend/booking-service
+      dockerfile: Dockerfile
+    container_name: quantcrux-booking
+    ports:
+      - "8090:8090"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - quantcrux-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/quantcrux_booking
+      SPRING_DATASOURCE_USERNAME: quantcrux
+      SPRING_DATASOURCE_PASSWORD: quantcrux123
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  # Lifecycle Service
+  lifecycle-service:
+    build:
+      context: ./backend/lifecycle-service
+      dockerfile: Dockerfile
+    container_name: quantcrux-lifecycle
+    ports:
+      - "8091:8091"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - quantcrux-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/quantcrux_lifecycle
+      SPRING_DATASOURCE_USERNAME: quantcrux
+      SPRING_DATASOURCE_PASSWORD: quantcrux123
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  # Pricing Engine
+  pricing-engine:
+    build:
+      context: ./backend/pricing-engine
+      dockerfile: Dockerfile
+    container_name: quantcrux-pricing
+    ports:
+      - "8092:8092"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - quantcrux-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/quantcrux_pricing
       SPRING_DATASOURCE_USERNAME: quantcrux
       SPRING_DATASOURCE_PASSWORD: quantcrux123
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/

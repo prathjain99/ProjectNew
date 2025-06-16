@@ -10,6 +10,7 @@ import ProductCreator from '../Products/ProductCreator';
 import Portfolio from '../Portfolio/Portfolio';
 import Analytics from '../Analytics/Analytics';
 import Reports from '../Reports/Reports';
+import TradingDesk from '../Trading/TradingDesk';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
@@ -22,18 +23,15 @@ const Dashboard: React.FC = () => {
         <main className="flex-1 overflow-y-auto bg-gray-900 p-6">
           <Routes>
             <Route path="/" element={<Overview />} />
-            {user?.role === 'researcher' && (
+            <Route path="/trading" element={<TradingDesk />} />
+            {(user?.role === 'researcher' || user?.role === 'portfolio_manager') && (
               <>
                 <Route path="/strategies" element={<StrategyBuilder />} />
                 <Route path="/backtesting" element={<Backtesting />} />
               </>
             )}
             {user?.role === 'portfolio_manager' && (
-              <>
-                <Route path="/products" element={<ProductCreator />} />
-                <Route path="/strategies" element={<StrategyBuilder />} />
-                <Route path="/backtesting" element={<Backtesting />} />
-              </>
+              <Route path="/products" element={<ProductCreator />} />
             )}
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/analytics" element={<Analytics />} />

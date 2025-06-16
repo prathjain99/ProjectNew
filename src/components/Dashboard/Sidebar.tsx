@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
-import { TrendingUp, BarChart3, Vibrate as Strategy, PieChart, FileText, Briefcase, TestTube, Settings, Activity, Package } from 'lucide-react';
+import { TrendingUp, BarChart3, Vibrate as Strategy, PieChart, FileText, Briefcase, TestTube, Settings, Activity, Package, DollarSign } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
   const { user } = useAuth();
@@ -28,13 +28,19 @@ const Sidebar: React.FC = () => {
       return [
         ...baseItems.slice(0, 1),
         { path: '/dashboard/products', icon: Package, label: 'Product Creator' },
+        { path: '/dashboard/trading', icon: DollarSign, label: 'Trading Desk' },
         { path: '/dashboard/strategies', icon: Strategy, label: 'Strategies' },
         { path: '/dashboard/backtesting', icon: TestTube, label: 'Backtesting' },
         ...baseItems.slice(1)
       ];
     }
 
-    return baseItems;
+    // Client role gets trading desk access
+    return [
+      ...baseItems.slice(0, 1),
+      { path: '/dashboard/trading', icon: DollarSign, label: 'Trading Desk' },
+      ...baseItems.slice(1)
+    ];
   };
 
   const menuItems = getMenuItems();

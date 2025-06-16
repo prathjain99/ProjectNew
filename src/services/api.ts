@@ -115,4 +115,37 @@ export const reportingAPI = {
     api.post('/api/reports/generate', request),
 };
 
+export const bookingAPI = {
+  bookTrade: (request: any) =>
+    api.post('/api/trades/book', request),
+  
+  getTrades: () =>
+    api.get('/api/trades'),
+  
+  getTrade: (id: string) =>
+    api.get(`/api/trades/${id}`),
+  
+  updateTradeStatus: (id: string, status: string) =>
+    api.put(`/api/trades/${id}/status?status=${status}`),
+};
+
+export const lifecycleAPI = {
+  getTradeEvents: (tradeId: string) =>
+    api.get(`/api/lifecycle/events/${tradeId}`),
+  
+  processFixings: () =>
+    api.post('/api/lifecycle/process-fixings'),
+  
+  checkBarriers: () =>
+    api.post('/api/lifecycle/check-barriers'),
+};
+
+export const pricingAPI = {
+  calculatePrice: (request: any) =>
+    api.post('/api/pricing/calculate', request),
+  
+  monteCarloPrice: (request: any) =>
+    api.post('/api/pricing/monte-carlo', request),
+};
+
 export default api;

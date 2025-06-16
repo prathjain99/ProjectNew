@@ -68,6 +68,27 @@ spring:
           filters:
             - StripPrefix=0
             - name: JwtAuthenticationFilter
+        - id: booking-service
+          uri: lb://booking-service
+          predicates:
+            - Path=/api/trades/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
+        - id: lifecycle-service
+          uri: lb://lifecycle-service
+          predicates:
+            - Path=/api/lifecycle/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
+        - id: pricing-engine
+          uri: lb://pricing-engine
+          predicates:
+            - Path=/api/pricing/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
       globalcors:
         cors-configurations:
           '[/**]':
