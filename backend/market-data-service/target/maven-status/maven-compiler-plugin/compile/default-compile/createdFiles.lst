@@ -1,0 +1,4 @@
+com/quantcrux/marketdata/MarketDataServiceApplication.class
+com/quantcrux/marketdata/dto/MarketDataPoint.class
+com/quantcrux/marketdata/controller/MarketDataController.class
+com/quantcrux/marketdata/service/MarketDataService.class

@@ -1,0 +1,10 @@
+com/quantcrux/portfolio/dto/PortfolioSummary$ProductDto.class
+com/quantcrux/portfolio/dto/PortfolioSummary$Summary.class
+com/quantcrux/portfolio/entity/Position.class
+com/quantcrux/portfolio/service/PortfolioService.class
+com/quantcrux/portfolio/controller/PortfolioController.class
+com/quantcrux/portfolio/repository/PositionRepository.class
+com/quantcrux/portfolio/dto/PortfolioSummary.class
+com/quantcrux/portfolio/dto/PortfolioSummary$PositionDto.class
+com/quantcrux/portfolio/PortfolioServiceApplication.class
+com/quantcrux/portfolio/entity/PositionType.class

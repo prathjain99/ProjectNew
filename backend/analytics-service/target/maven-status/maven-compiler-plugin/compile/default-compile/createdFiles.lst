@@ -1,0 +1,4 @@
+com/quantcrux/analytics/dto/RiskMetrics.class
+com/quantcrux/analytics/AnalyticsServiceApplication.class
+com/quantcrux/analytics/controller/AnalyticsController.class
+com/quantcrux/analytics/service/AnalyticsService.class

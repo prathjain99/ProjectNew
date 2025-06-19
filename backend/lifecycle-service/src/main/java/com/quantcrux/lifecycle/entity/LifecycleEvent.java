@@ -99,10 +99,3 @@ public class LifecycleEvent {
     public void setNotes(String notes) { this.notes = notes; }
 }
 
-enum EventType {
-    FIXING, COUPON_PAYMENT, BARRIER_BREACH, KNOCK_IN, KNOCK_OUT, AUTOCALL, MATURITY, EARLY_REDEMPTION
-}
-
-enum EventStatus {
-    PENDING, PROCESSED, FAILED, CANCELLED
-}

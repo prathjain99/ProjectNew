@@ -1,0 +1,7 @@
+com/quantcrux/product/dto/ProductRequest.class
+com/quantcrux/product/entity/Product.class
+com/quantcrux/product/entity/ProductType.class
+com/quantcrux/product/service/ProductService.class
+com/quantcrux/product/controller/ProductController.class
+com/quantcrux/product/repository/ProductRepository.class
+com/quantcrux/product/ProductServiceApplication.class

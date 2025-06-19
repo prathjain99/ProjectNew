@@ -127,11 +127,3 @@ public class Trade {
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
 }
-
-enum TradeType {
-    BUY, SELL
-}
-
-enum TradeStatus {
-    PENDING, BOOKED, CONFIRMED, SETTLED, CANCELLED, EXPIRED
-}

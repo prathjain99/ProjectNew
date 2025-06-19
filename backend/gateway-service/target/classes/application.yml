@@ -1,0 +1,130 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=0
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
+        - id: strategy-service
+          uri: lb://strategy-service
+          predicates:
+            - Path=/api/strategies/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
+        - id: backtest-service
+          uri: lb://backtest-service
+          predicates:
+            - Path=/api/backtest/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
+        - id: market-data-service
+          uri: lb://market-data-service
+          predicates:
+            - Path=/api/market-data/**
+          filters:
+            - StripPrefix=0
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/products/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
+        - id: portfolio-service
+          uri: lb://portfolio-service
+          predicates:
+            - Path=/api/portfolio/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
+        - id: analytics-service
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/analytics/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
+        - id: reporting-service
+          uri: lb://reporting-service
+          predicates:
+            - Path=/api/reports/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
+        - id: booking-service
+          uri: lb://booking-service
+          predicates:
+            - Path=/api/trades/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
+        - id: lifecycle-service
+          uri: lb://lifecycle-service
+          predicates:
+            - Path=/api/lifecycle/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
+        - id: pricing-engine
+          uri: lb://pricing-engine
+          predicates:
+            - Path=/api/pricing/**
+          filters:
+            - StripPrefix=0
+            - name: JwtAuthenticationFilter
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: 
+              - "http://localhost:5173"
+              - "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  secret: quantcrux-secret-key-for-jwt-token-generation-and-validation
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.cors: DEBUG

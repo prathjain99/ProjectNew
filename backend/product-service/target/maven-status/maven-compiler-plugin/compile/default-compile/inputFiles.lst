@@ -1,0 +1,7 @@
+/home/pratham/ProjectNew/backend/product-service/src/main/java/com/quantcrux/product/repository/ProductRepository.java
+/home/pratham/ProjectNew/backend/product-service/src/main/java/com/quantcrux/product/ProductServiceApplication.java
+/home/pratham/ProjectNew/backend/product-service/src/main/java/com/quantcrux/product/entity/ProductType.java
+/home/pratham/ProjectNew/backend/product-service/src/main/java/com/quantcrux/product/controller/ProductController.java
+/home/pratham/ProjectNew/backend/product-service/src/main/java/com/quantcrux/product/service/ProductService.java
+/home/pratham/ProjectNew/backend/product-service/src/main/java/com/quantcrux/product/dto/ProductRequest.java
+/home/pratham/ProjectNew/backend/product-service/src/main/java/com/quantcrux/product/entity/Product.java

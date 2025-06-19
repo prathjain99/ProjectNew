@@ -1,0 +1,7 @@
+com/quantcrux/user/entity/InvestmentExperience.class
+com/quantcrux/user/entity/UserProfile.class
+com/quantcrux/user/UserServiceApplication.class
+com/quantcrux/user/entity/RiskTolerance.class
+com/quantcrux/user/service/UserService.class
+com/quantcrux/user/controller/UserController.class
+com/quantcrux/user/repository/UserProfileRepository.class

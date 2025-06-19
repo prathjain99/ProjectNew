@@ -3,9 +3,13 @@ package com.quantcrux.product.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+
+
 @Entity
 @Table(name = "products")
 public class Product {
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -100,12 +104,4 @@ public class Product {
     
     public Boolean getIsActive() { return isActive; }
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-}
-
-enum ProductType {
-    DIGITAL_OPTION,
-    BARRIER_OPTION,
-    DUAL_CURRENCY,
-    AUTOCALLABLE,
-    REVERSE_CONVERTIBLE
 }

@@ -1,0 +1,7 @@
+com/quantcrux/backtest/dto/BacktestResponse.class
+com/quantcrux/backtest/dto/BacktestRequest.class
+com/quantcrux/backtest/BacktestServiceApplication.class
+com/quantcrux/backtest/entity/BacktestResult.class
+com/quantcrux/backtest/controller/BacktestController.class
+com/quantcrux/backtest/repository/BacktestResultRepository.class
+com/quantcrux/backtest/service/BacktestService.class
