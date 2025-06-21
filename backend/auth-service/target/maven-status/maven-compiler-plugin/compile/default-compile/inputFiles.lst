@@ -1,0 +1,11 @@
+/home/pratham/ProjectNew/backend/auth-service/src/main/java/com/quantcrux/auth/dto/AuthResponse.java
+/home/pratham/ProjectNew/backend/auth-service/src/main/java/com/quantcrux/auth/entity/Role.java
+/home/pratham/ProjectNew/backend/auth-service/src/main/java/com/quantcrux/auth/controller/AuthController.java
+/home/pratham/ProjectNew/backend/auth-service/src/main/java/com/quantcrux/auth/repository/UserRepository.java
+/home/pratham/ProjectNew/backend/auth-service/src/main/java/com/quantcrux/auth/AuthServiceApplication.java
+/home/pratham/ProjectNew/backend/auth-service/src/main/java/com/quantcrux/auth/entity/User.java
+/home/pratham/ProjectNew/backend/auth-service/src/main/java/com/quantcrux/auth/dto/RegisterRequest.java
+/home/pratham/ProjectNew/backend/auth-service/src/main/java/com/quantcrux/auth/util/JwtUtil.java
+/home/pratham/ProjectNew/backend/auth-service/src/main/java/com/quantcrux/auth/service/AuthService.java
+/home/pratham/ProjectNew/backend/auth-service/src/main/java/com/quantcrux/auth/dto/LoginRequest.java
+/home/pratham/ProjectNew/backend/auth-service/src/main/java/com/quantcrux/auth/config/SecurityConfig.java

@@ -1,0 +1,4 @@
+com/quantcrux/gateway/GatewayServiceApplication.class
+com/quantcrux/gateway/filter/JwtAuthenticationFilter$Config.class
+com/quantcrux/gateway/filter/JwtAuthenticationFilter.class
+com/quantcrux/gateway/config/SecurityConfig.class

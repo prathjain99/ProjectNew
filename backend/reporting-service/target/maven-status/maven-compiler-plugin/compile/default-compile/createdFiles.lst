@@ -1,0 +1,4 @@
+com/quantcrux/reporting/dto/ReportRequest.class
+com/quantcrux/reporting/service/ReportingService.class
+com/quantcrux/reporting/ReportingServiceApplication.class
+com/quantcrux/reporting/controller/ReportingController.class

@@ -1,0 +1,3 @@
+/home/pratham/ProjectNew/backend/gateway-service/src/main/java/com/quantcrux/gateway/config/SecurityConfig.java
+/home/pratham/ProjectNew/backend/gateway-service/src/main/java/com/quantcrux/gateway/GatewayServiceApplication.java
+/home/pratham/ProjectNew/backend/gateway-service/src/main/java/com/quantcrux/gateway/filter/JwtAuthenticationFilter.java
